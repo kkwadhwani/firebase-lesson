@@ -2,9 +2,10 @@ import { initializeApp } from "firebase/app";
 import {
   getFirestore,
   doc,
-  getDoc,
   collection,
   addDoc,
+  query,
+  onSnapshot
 } from "firebase/firestore";
 
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -57,8 +58,25 @@ async function addDocument(e) {
   try {
     const docRef = await addDoc(c, data);
     console.log("Document is set with ", docRef.id);
+    form.reset();
   } catch (e) {
     console.log(e);
   }
 }
+
+const resList = document.getElementById("res-list")
+
+const q = query(collection(db, "restaurants"))
+
+ const unsubscribe = onSnapshot(q, (snapshot)=>{
+     let restaurants = []
+     snapshot.forEach((item)=>{
+         restaurants.push(item.data())
+       
+        
+     })
+    console.log(restaurants)
+ })
+
+
 
