@@ -7,7 +7,7 @@ import {
   query,
   onSnapshot
 } from "firebase/firestore";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { getStorage, ref, uploadBytes, getDownloadURL, uploadBytesResumable } from "firebase/storage";
 
 
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -114,17 +114,37 @@ pic.addEventListener('change', uploadPic)
 
 
 function uploadPic(e){
-
-  console.log(e.target.files)
   e.preventDefault()
-  console.log("It is inside")
- const imageRef =  ref(storage, `image/'newimage'`)
- const storageRef = uploadBytes(imageRef, e.target.files[0])
- .then((snapshot)=>{
-   alert("File uploaded successfully")
+  const num = Math.ceil(Math.random()*100000)
+console.log("loading num")
+ const imageRef =  ref(storage, `image/image_${num}`)
+//  let storageRef =  uploadBytes(imageRef, e.target.files[0])
 
-   getDownloadURL(snapshot.ref).then(url=>console.log(url))
- }).catch((error)=>{console.log(error)})
+
+
+//uploadBytesResumable
+let bar = document.getElementById("bar")
+console.log(bar)
+const uploadTask = uploadBytesResumable(imageRef, e.target.files[0]);
+uploadTask.on('state_changed', (snapshot)=>{
+
+  const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+ 
+  bar.style.width=`${progress}%`
+  console.log('Upload is ' + progress + '% done');
+
+  if(progress===100){
+   
+ 
+      document.getElementById("bar_back").style.displya="none"
+      bar.style.backgroundColor="white"
+      bar.innerHTML ="Successfully Uploaded"
+  
+    
+  }
+})
+
+
 
 
 // getDownloadURL(storageRef.snapshot.ref)
@@ -134,11 +154,19 @@ function uploadPic(e){
 
 //Downloading the image from storageRef
 
+const criteria ={
+  paid:true
+}
 
-getDownloadURL(ref(storage, "image/'newimage'"))
-.then(url=>{
-  const img = document.getElementById('img');
-  img.setAttribute('src', url);
-
-
-})
+if(criteria.paid){
+  getDownloadURL(ref(storage, "image/'newimage'"))
+  .then(url=>{
+    const img = document.getElementById('img');
+    img.setAttribute('src', url);
+  
+  
+  })
+}else{
+const message = document.getElementById("message")
+message.innerHTML="You have not paid for this item so please pay first"
+}
