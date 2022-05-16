@@ -114,16 +114,31 @@ pic.addEventListener('change', uploadPic)
 
 
 function uploadPic(e){
+
+  console.log(e.target.files)
   e.preventDefault()
   console.log("It is inside")
- const imageRef =  ref(storage, `image/${pic.files[0].name}`)
- const storageRef = uploadBytes(imageRef, pic.files)
+ const imageRef =  ref(storage, `image/'newimage'`)
+ const storageRef = uploadBytes(imageRef, e.target.files[0])
  .then((snapshot)=>{
    alert("File uploaded successfully")
+
+   getDownloadURL(snapshot.ref).then(url=>console.log(url))
  }).catch((error)=>{console.log(error)})
 
-pic.reset
+
 // getDownloadURL(storageRef.snapshot.ref)
 // .then((downloadURL)=>{console.log("The url is stored at ", downloadURL)})
 // .catch(e=>{console.log(console.log(e))})
 }
+
+//Downloading the image from storageRef
+
+
+getDownloadURL(ref(storage, "image/'newimage'"))
+.then(url=>{
+  const img = document.getElementById('img');
+  img.setAttribute('src', url);
+
+
+})
