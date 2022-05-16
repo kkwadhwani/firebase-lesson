@@ -7,6 +7,8 @@ import {
   query,
   onSnapshot
 } from "firebase/firestore";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+
 
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
@@ -64,7 +66,7 @@ async function addDocument(e) {
   }
 }
 
-const resList = document.getElementById("res-list")
+
 
 const q = query(collection(db, "restaurants"))
 
@@ -76,7 +78,52 @@ const q = query(collection(db, "restaurants"))
         
      })
     console.log(restaurants)
+
+    for(let i=0; i<restaurants.length; i++){
+
+        const d = document.createElement('div')
+        
+        let li = document.createElement('li')
+         li.innerHTML = `<h1>${restaurants[i].name}</h1>
+                            <p>${restaurants[i].year}</p>
+                            <p>${restaurants[i].location}</p>
+                            <p>${restaurants[i].closed}</p>
+         
+         `
+    
+         d.append(li)
+    
+         resList.append(d)
+    
+    }
+
+
+
+
  })
 
 
+ const resList = document.getElementById("res-list")
 
+
+//Storage files 
+const storage = getStorage()
+
+const pic = document.getElementById("image")
+pic.addEventListener('change', uploadPic)
+
+
+function uploadPic(e){
+  e.preventDefault()
+  console.log("It is inside")
+ const imageRef =  ref(storage, `image/${pic.files[0].name}`)
+ const storageRef = uploadBytes(imageRef, pic.files)
+ .then((snapshot)=>{
+   alert("File uploaded successfully")
+ }).catch((error)=>{console.log(error)})
+
+pic.reset
+// getDownloadURL(storageRef.snapshot.ref)
+// .then((downloadURL)=>{console.log("The url is stored at ", downloadURL)})
+// .catch(e=>{console.log(console.log(e))})
+}
